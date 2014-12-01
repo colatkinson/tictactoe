@@ -8,6 +8,7 @@ using namespace std;
 
 #define SIZE 3
 
+
 typedef vector< tuple<int, int> > moveList;
 typedef vector< vector<int> > field;
 
@@ -46,15 +47,27 @@ moveList Board::getMoves() const
     return moves;
 }
 
+bool isvalueinarray(int val, int *arr, int size){
+    int i;
+    for (i=0; i < size; i++) {
+        if (arr[i] == val)
+            return true;
+    }
+    return false;
+}
+
 bool Board::won(int letter)
 {
-    vector<int> rows(SIZE, 0);
-    vector<int> cols(SIZE, 0);
-    vector<int> diags(2, 0);
+    //vector<int> rows(SIZE, 0);
+    int rows[SIZE] = {0};
+    //vector<int> cols(SIZE, 0);
+    int cols[SIZE] = {0};
+    //vector<int> diags(2, 0);
+    int diags[2] = {0};
 
-    for(int y = 0; y < rows.size(); y++)
+    for(int y = 0; y < SIZE; y++)
     {
-        for(int x = 0; x < cols.size(); x++)
+        for(int x = 0; x < SIZE; x++)
         {
             if((*boardArr)[y][x] == letter)
             {
@@ -73,9 +86,12 @@ bool Board::won(int letter)
             }
         }
     }
-    bool rows_good = find(rows.begin(), rows.end(), SIZE) != rows.end();
-    bool cols_good = find(cols.begin(), cols.end(), SIZE) != cols.end();
-    bool diags_good = find(diags.begin(), diags.end(), SIZE) != diags.end();
+    //bool rows_good = find(rows.begin(), rows.end(), SIZE) != rows.end();
+    bool rows_good = isvalueinarray(SIZE, rows, SIZE);
+    //bool cols_good = find(cols.begin(), cols.end(), SIZE) != cols.end();
+    bool cols_good = isvalueinarray(SIZE, cols, SIZE);
+    //bool diags_good = find(diags.begin(), diags.end(), SIZE) != diags.end();
+    bool diags_good = isvalueinarray(SIZE, diags, 2);
 
     return (rows_good || cols_good || diags_good);
 }
@@ -249,6 +265,7 @@ int main(void)
     //int arr[] = {0, 0, 0};
     //field arr {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
     vector<std::vector<int>> arr(SIZE, vector<int>(SIZE));
+    //int arr[SIZE][SIZE] = {{0}};
     Board board (&arr);
     //board.prettyPrint();
     /*field arr2 = playerTurn(board);
