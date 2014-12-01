@@ -4,19 +4,24 @@
 #include <tuple>
 #include <iterator>
 #include <numeric>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 using namespace std;
 
 #define SIZE 3
 
 
 typedef vector< tuple<int, int> > moveList;
+//typedef array< array<int, SIZE>, SIZE > field;
 typedef vector< vector<int> > field;
 
 class Board
 {
     public:
         field* boardArr;
-        Board(vector< vector<int> >*);
+        Board(field*);
         moveList getMoves() const;
         bool won(int);
         void prettyPrint() const;
@@ -30,7 +35,7 @@ Board::Board(field* arr)
 moveList Board::getMoves() const
 {
     moveList moves;
-    int x=0, y=0;
+    moves.reserve(SIZE*SIZE);
     //vector<int> moves;
     for(int y = 0; y < SIZE; y++)
     {
@@ -44,12 +49,13 @@ moveList Board::getMoves() const
         }
     }
 
+    moves.shrink_to_fit();
     return moves;
 }
 
-bool isvalueinarray(int val, int *arr, int size){
-    int i;
-    for (i=0; i < size; i++) {
+bool isvalueinarray(int val, int *arr, int size)
+{
+    for (int i=0; i < size; i++) {
         if (arr[i] == val)
             return true;
     }
@@ -87,13 +93,15 @@ bool Board::won(int letter)
         }
     }
     //bool rows_good = find(rows.begin(), rows.end(), SIZE) != rows.end();
-    bool rows_good = isvalueinarray(SIZE, rows, SIZE);
+    /*bool rows_good = isvalueinarray(SIZE, rows, SIZE);
     //bool cols_good = find(cols.begin(), cols.end(), SIZE) != cols.end();
     bool cols_good = isvalueinarray(SIZE, cols, SIZE);
     //bool diags_good = find(diags.begin(), diags.end(), SIZE) != diags.end();
-    bool diags_good = isvalueinarray(SIZE, diags, 2);
+    bool diags_good = isvalueinarray(SIZE, diags, 2);*/
 
-    return (rows_good || cols_good || diags_good);
+    return (isvalueinarray(SIZE, rows, SIZE) ||
+            isvalueinarray(SIZE, cols, SIZE) ||
+            isvalueinarray(SIZE, diags, 2));
 }
 
 void Board::prettyPrint() const
@@ -229,9 +237,15 @@ field userTurn(const Board& board)
     {
 
         cout << "Enter your desired x-coord: ";
+        #ifdef __EMSCRIPTEN__
+        cout << endl;
+        #endif
         cin >> x_coord;
 
         cout << "Enter your desired y-coord: ";
+        #ifdef __EMSCRIPTEN__
+        cout << endl;
+        #endif
         cin >> y_coord;
 
         if(x_coord >= 1 && x_coord <= SIZE && y_coord >= 1
@@ -265,6 +279,7 @@ int main(void)
     //int arr[] = {0, 0, 0};
     //field arr {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
     vector<std::vector<int>> arr(SIZE, vector<int>(SIZE));
+    //field arr{{0}};
     //int arr[SIZE][SIZE] = {{0}};
     Board board (&arr);
     //board.prettyPrint();
